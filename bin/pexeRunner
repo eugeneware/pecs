@@ -8,6 +8,7 @@ require_once(__DIR__ . '/../lib/mochaformatter.php');
 
 $options = array(
 	'watch' => false,
+	'growl' => false,
 );
 
 // Include the tests
@@ -17,6 +18,11 @@ foreach ($argv as $arg) {
 		case '-w':
 		case '--watch':
 			$options['watch'] = true;
+			break;
+
+		case '-g':
+		case '--growl':
+			$options['growl'] = true;
 			break;
 
 		default:
@@ -47,4 +53,4 @@ foreach ($argv as $arg) {
 }
 
 // Run the tests
-\pecs\run(new \pecs\MochaFormatter(array('growl' => $options['watch'])));
+\pecs\run(new \pecs\MochaFormatter(array('growl' => $options['growl'])));

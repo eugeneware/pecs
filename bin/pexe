@@ -12,15 +12,15 @@ $options = array(
 array_shift($argv);
 $args = array();
 foreach ($argv as $arg) {
-	switch ($arg) {
-		case '-w':
-		case '--watch':
-			$options['watch'] = true;
-			break;
-
-		default:
-			$args[] = $arg;
-			break;
+	if ($arg[0] == '-') {
+		switch ($arg) {
+			case '-w':
+			case '--watch':
+				$options['watch'] = true;
+				break;
+		}
+	} else {
+		$args[] = $arg;
 	}
 }
 
