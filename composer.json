@@ -1,7 +1,13 @@
 {
-    "name": "noonat/pecs",
+    "name": "nharbour/pecs",
     "require": {
         "php": ">=5.3.0"
-    }
+    },
+    "autoload": { 
+        "files": ["lib/pecs.php"] 
+    },
+    "bin": [
+        "pecs"
+    ]
 }
 
