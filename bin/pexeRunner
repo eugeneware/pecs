@@ -22,8 +22,24 @@ foreach ($argv as $arg) {
 		default:
 			$files = glob($arg);
 			foreach ($files as $file) {
-				if (preg_match("/.*\.php$/sim", $file)) {
-					require_once($file);
+				if (is_dir($file)) {
+					$dirFiles = new RecursiveDirectoryIterator($file);
+					$dirFiles = new RecursiveIteratorIterator(
+						$dirFiles, RecursiveIteratorIterator::CHILD_FIRST);
+					foreach ($dirFiles as $file) {
+						$pathname = $file->getPathname();
+						if (preg_match('/\.php$/', $pathname)) {
+							$_files[] = $pathname;
+						}
+					}
+				} else {
+					$_files[] = $file;
+				}
+
+				foreach ($_files as $file) {
+					if (preg_match("/.*\.php$/sim", $file)) {
+						require_once($file);
+					}
 				}
 			}
 			break;
