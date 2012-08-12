@@ -172,7 +172,7 @@ function testWatch($files) {
 function runTests($files) {
 	global $argv;
 
-	$path = __DIR__ . '/pexeRunner';
+	$path = __DIR__ . '/pecsRunner';
 	$pid= pcntl_fork();
 	if ($pid) {
 		// parent

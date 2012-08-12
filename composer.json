@@ -7,7 +7,7 @@
         "files": ["lib/pecs.php"] 
     },
     "bin": [
-        "bin/pexe"
+        "bin/pecs"
     ],
 	"minimum-stability": "dev",
 	"license": "MIT"
