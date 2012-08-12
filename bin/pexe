@@ -1,0 +1,145 @@
+#!/usr/bin/env php
+<?php
+// Make sure we don't time out
+set_time_limit(0);
+
+// process command line arguments
+array_shift($argv);
+if (count($argv) == 0) {
+	$argv = array('./tests/*.php');
+}
+
+$files = array();
+foreach ($argv as $arg) {
+	$files = array_merge($files, glob($arg));
+}
+
+require_once(__DIR__ . '/../lib/pecs.php');
+require_once(__DIR__ . '/../lib/mochaformatter.php');
+
+// Handle Signals
+declare(ticks = 1);
+pcntl_signal(SIGTERM, "signal_handler");
+pcntl_signal(SIGINT, "signal_handler");
+function signal_handler($signal) {
+	switch($signal) {
+		case SIGTERM:
+		case SIGKILL:
+		case SIGINT:
+			shutdown();
+			exit;
+
+		default:
+			exit;
+	}
+}
+
+// Reset the cursor when we quit
+function shutdown() {
+	stop();
+	showCursor();
+	echo("\n");
+}
+
+// Animation spinny loading things
+function frames() {
+  $frames = array(
+      "  \033[96m◜ \033[90mwatching\033[0m"
+    , "  \033[96m◠ \033[90mwatching\033[0m"
+    , "  \033[96m◝ \033[90mwatching\033[0m"
+    , "  \033[96m◞ \033[90mwatching\033[0m"
+    , "  \033[96m◡ \033[90mwatching\033[0m"
+    , "  \033[96m◟ \033[90mwatching\033[0m"
+  );
+
+  return $frames;
+}
+
+// Hide the cursor
+function hideCursor() {
+	echo "\033[?25l";
+}
+
+// Show the cursor
+function showCursor() {
+	echo "\033[?25h";
+}
+
+// Play one pass of the animation
+function play($frames, $interval = 100000) {
+	foreach ($frames as $frame) {
+		usleep($interval);
+		echo "\r" . $frame;
+	}
+}
+
+// Erase the line and Carriage Return
+function stop() {
+	echo "\033[2K";
+}
+
+// Watch the folder for changes
+function watch($files) {
+	static $_cache = array();
+
+	clearstatcache();
+	$modified = array();
+	foreach ($files as $file) {
+		if (preg_match("/.*\.php$/sim", $file)) {
+			if (file_exists($file)) {
+				$stat = stat($file);
+
+				if (isset($_cache[$file])) {
+					$lastStat = $_cache[$file];
+					if ($stat['mtime'] > $lastStat['mtime']) {
+						$modified[] = $file;
+					}
+				} else {
+					$modified[] = $file;
+				}
+
+				$_cache[$file] = $stat;
+			}
+		}
+	}
+
+	return $modified;
+}
+
+// Watch folder for changes and then run the tests when stuff changes
+function testWatch($files) {
+	$frames = frames();
+
+	hideCursor();
+
+	while (true) {
+		play($frames);
+		$modified = watch($files);
+		if ($modified) {
+			runTests($files);
+		}
+	}
+
+	stop();
+	echo("\n");
+	showCursor();
+}
+
+// Run the tests
+function runTests($files) {
+	global $argv;
+
+	echo "\n\n";
+	$path = __DIR__ . '/pexeRunner';
+	$pid= pcntl_fork();
+	if ($pid) {
+		// parent
+		pcntl_waitpid($pid, $status);
+	} else {
+		// child
+		pcntl_exec($path, $argv);
+	}
+}
+
+// Start Watching
+testWatch($files);
