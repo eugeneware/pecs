@@ -87,13 +87,7 @@ class MochaFormatter extends Formatter {
             if ($spec->failed()) {
                 foreach ($spec->failures as $failure) {
 					$failedNum++;
-					$description = $spec->description;
-
-					$parent = $spec->parent;
-					while (!empty($parent)) {
-						$description = $parent->description . ' ' . $description;
-						$parent = $parent->parent;
-					}
+					$description = $spec->parent->description . ' ' . $spec->description;
 
 					echo '  ' . $failedNum . ') ' . $description .  ":\n";
                     echo $this->color('     ' . $failure->getMessage()."\n", 'red');
