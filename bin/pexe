@@ -26,8 +26,8 @@ foreach ($argv as $arg) {
 
 // default args
 if (count($args) == 0) {
-	$argv[] = './tests/*.php';
-	$args[] = './tests/*.php';
+	$argv[] = './tests';
+	$args[] = './tests';
 }
 
 // find files to watch
