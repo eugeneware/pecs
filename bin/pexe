@@ -3,17 +3,40 @@
 // Make sure we don't time out
 set_time_limit(0);
 
-// process command line arguments
+// default options
+$options = array(
+	'watch' => false,
+);
+
+// process command line options
 array_shift($argv);
-if (count($argv) == 0) {
-	$argv = array('./tests/*.php');
+$args = array();
+foreach ($argv as $arg) {
+	switch ($arg) {
+		case '-w':
+		case '--watch':
+			$options['watch'] = true;
+			break;
+
+		default:
+			$args[] = $arg;
+			break;
+	}
 }
 
+// default args
+if (count($args) == 0) {
+	$argv[] = './tests/*.php';
+	$args[] = './tests/*.php';
+}
+
+// find files to watch
 $files = array();
-foreach ($argv as $arg) {
+foreach ($args as $arg) {
 	$files = array_merge($files, glob($arg));
 }
 
+// Load test libraries
 require_once(__DIR__ . '/../lib/pecs.php');
 require_once(__DIR__ . '/../lib/mochaformatter.php');
 
@@ -116,6 +139,7 @@ function testWatch($files) {
 		play($frames);
 		$modified = watch($files);
 		if ($modified) {
+			echo "\n";
 			runTests($files);
 		}
 	}
@@ -129,7 +153,6 @@ function testWatch($files) {
 function runTests($files) {
 	global $argv;
 
-	echo "\n\n";
 	$path = __DIR__ . '/pexeRunner';
 	$pid= pcntl_fork();
 	if ($pid) {
@@ -142,4 +165,8 @@ function runTests($files) {
 }
 
 // Start Watching
-testWatch($files);
+if ($options['watch']) {
+	testWatch($files);
+} else {
+	runTests($files);
+}

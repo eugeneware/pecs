@@ -6,16 +6,29 @@ set_time_limit(0);
 require_once(__DIR__ . '/../lib/pecs.php');
 require_once(__DIR__ . '/../lib/mochaformatter.php');
 
+$options = array(
+	'watch' => false,
+);
+
 // Include the tests
 array_shift($argv);
 foreach ($argv as $arg) {
-	$files = glob($arg);
-	foreach ($files as $file) {
-		if (preg_match("/.*\.php$/sim", $file)) {
-			require_once($file);
-		}
+	switch ($arg) {
+		case '-w':
+		case '--watch':
+			$options['watch'] = true;
+			break;
+
+		default:
+			$files = glob($arg);
+			foreach ($files as $file) {
+				if (preg_match("/.*\.php$/sim", $file)) {
+					require_once($file);
+				}
+			}
+			break;
 	}
 }
 
 // Run the tests
-\pecs\run(new \pecs\MochaFormatter(array('growl' => true)));
+\pecs\run(new \pecs\MochaFormatter(array('growl' => $options['watch'])));
