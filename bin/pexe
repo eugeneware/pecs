@@ -105,9 +105,28 @@ function stop() {
 function watch($files) {
 	static $_cache = array();
 
+	// Get all possible files
+	$_files = array();
+	foreach ($files as $file) {
+		if (is_dir($file)) {
+			$dirFiles = new RecursiveDirectoryIterator($file);
+			$dirFiles = new RecursiveIteratorIterator(
+				$dirFiles, RecursiveIteratorIterator::CHILD_FIRST);
+			foreach ($dirFiles as $file) {
+				$pathname = $file->getPathname();
+				if (preg_match('/\.php$/', $pathname)) {
+					$_files[] = $pathname;
+				}
+			}
+		} else {
+			$_files[] = $file;
+		}
+	}
+
+	// Check files for modifications
 	clearstatcache();
 	$modified = array();
-	foreach ($files as $file) {
+	foreach ($_files as $file) {
 		if (preg_match("/.*\.php$/sim", $file)) {
 			if (file_exists($file)) {
 				$stat = stat($file);
