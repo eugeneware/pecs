@@ -109,10 +109,13 @@ class MochaFormatter extends Formatter {
 		$elapsed = number_format($this->runTime * 1000, 1);
 
 		if ($this->options['growl'] === true) {
+
+			$imagePath = __DIR__ . '/../images';
+
 			if ($failed) {
-				`growlnotify --image images/error.png -t "Failed" -m "$failed of $total tests failed"`;
+				`growlnotify --image $imagePath/error.png -t "Failed" -m "$failed of $total tests failed"`;
 			} else {
-				`growlnotify --image images/ok.png -t "Passed" -m "$total tests passed in ${elapsed}ms"`;
+				`growlnotify --image $imagePath/ok.png -t "Passed" -m "$total tests passed in ${elapsed}ms"`;
 			}
 		}
     }
