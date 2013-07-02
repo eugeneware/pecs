@@ -1,5 +1,5 @@
 {
-    "name": "nharbour/pecs",
+    "name": "eugeneware/pecs",
     "require": {
         "php": ">=5.3.0"
     },
