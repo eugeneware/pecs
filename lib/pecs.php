@@ -24,7 +24,7 @@ function expect($actual) {
 }
 
 // by default we load the global functions unless PECS_GLOBALS explicitly set to false
-if (!defined('\PECS_GLOBALS') || constant('\PECS_GLOBALS') !== false) {
+if (defined('\PECS_GLOBALS') && constant('\PECS_GLOBALS') !== false) {
     registerGlobalFunctions();
 }
 
