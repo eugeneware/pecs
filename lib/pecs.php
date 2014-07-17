@@ -7,7 +7,6 @@ function errorToException($errno, $errstr, $errfile, $errline, $errcontext) {
 }
 set_error_handler('\pecs\errorToException', E_ALL);
 
-$code = <<<'EOC'
 function after_each($func) {
     return \pecs\runner()->suite->hook('after_each', $func);
 }
@@ -23,16 +22,19 @@ function it($description, $func) {
 function expect($actual) {
     return \pecs\runner()->spec->expect($actual);
 }
-EOC;
-// eval is the only way to execute within global namespace
-if (!defined('\PECS_GLOBALS') || constant('\PECS_GLOBALS') !== false) {
-    eval($code); // global ns aliases
+
+// by default we load the global functions unless PECS_GLOBALS explicitly set to false
+if (defined('\PECS_GLOBALS') && constant('\PECS_GLOBALS') !== false) {
+    registerGlobalFunctions();
 }
-eval("namespace pecs;\n$code"); // local ns aliases
 
 /// Run the tests.
 function run($formatter=null) {
     return runner()->run($formatter);
+}
+
+function registerGlobalFunctions () {
+    require_once __DIR__.'/registerglobalfunctions.php';
 }
 
 /// Return the Runner singleton, or set it to a new object.
@@ -83,7 +85,7 @@ class Runner {
         $suite = new Suite($description, $func, $this->suite);
         $this->suites[] = $suite;
         $this->suite = $suite;
-        $func();
+        $func($suite);
         $this->suite = $suite->parent;
         return $suite;
     }
@@ -292,7 +294,7 @@ class Expect {
         } else if (is_object($var)) {
             $var = var_export($var, true);
             return preg_replace(array('~array\(\s*\)~', '~::__set_state~'),
-                                array('array()', ''), $var);
+                array('array()', ''), $var);
         } else {
             return var_export($var, true);
         }
