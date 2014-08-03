@@ -19,6 +19,9 @@ function describe($description, $func) {
 function it($description, $func) {
     return \pecs\runner()->it($description, $func);
 }
+function should($description, $func) {
+    return it($description, $func);
+}
 function expect($actual) {
     return \pecs\runner()->spec->expect($actual);
 }
