@@ -8,25 +8,25 @@ function errorToException($errno, $errstr, $errfile, $errline, $errcontext) {
 set_error_handler('\pecs\errorToException', E_ALL);
 
 function after_each($func) {
-    return \pecs\runner()->suite->hook('after_each', $func);
+    return runner()->suite->hook('after_each', $func);
 }
 function before_each($func) {
-    return \pecs\runner()->suite->hook('before_each', $func);
+    return runner()->suite->hook('before_each', $func);
 }
 function describe($description, $func) {
-    return \pecs\runner()->describe($description, $func);
+    return runner()->describe($description, $func);
 }
 function it($description, $func) {
-    return \pecs\runner()->it($description, $func);
+    return runner()->it($description, $func);
 }
 function should($description, $func) {
     return it($description, $func);
 }
 function expect($actual) {
-    return \pecs\runner()->spec->expect($actual);
+    return runner()->spec->expect($actual);
 }
 function expect_to_throw ($exception_class) {
-    return \pecs\runner()->spec->expect_to_throw($exception_class);
+    return runner()->spec->expect_to_throw($exception_class);
 }
 
 // by default we load the global functions ONLY IF PECS_GLOBALS explicitly set to true
