@@ -249,6 +249,10 @@ class Spec extends Suite {
         }
     }
 
+    /**
+     * Determine if we are expecting this exception or not and handle each outcome.
+     * @param \Exception $e
+     */
     protected function handleApparentFailure (\Exception $e)
     {
         if ($this->expect_to_throw) {
@@ -329,8 +333,11 @@ class Expect {
             return 'null';
         } else if (is_object($var)) {
             $var = var_export($var, true);
-            return preg_replace(array('~array\(\s*\)~', '~::__set_state~'),
-            array('array()', ''), $var);
+            return preg_replace(
+                array('~array\(\s*\)~', '~::__set_state~'),
+                array('array()', ''),
+                $var
+            );
         } else {
             return var_export($var, true);
         }
@@ -338,11 +345,11 @@ class Expect {
 
     /// Matcher aliases
     public $_aliases = array(
-    'be_an' => 'be_a',
-    'equal' => 'be',
-    'have_count' => 'have_length',
-    'have_count_within' => 'have_length_within',
-    'throw' => 'throw_error',
+        'be_an' => 'be_a',
+        'equal' => 'be',
+        'have_count' => 'have_length',
+        'have_count_within' => 'have_length_within',
+        'throw' => 'throw_error',
     );
 
     /// New matchers can be defined by adding a function below.
@@ -369,22 +376,25 @@ class Expect {
 
     function be_within($min, $max) {
         return array(
-        $this->actual >= $min && $this->actual <= $max,
-        'expected %s to be within %s and %s', $this->actual, $min, $max);
+            $this->actual >= $min && $this->actual <= $max,
+            'expected %s to be within %s and %s', $this->actual, $min, $max
+        );
     }
 
     function be_a($expected) {
         $class = get_class($this->actual);
         return array(
-        $class === $expected,
-        "expected $class to be class $expected");
+            $class === $expected,
+            "expected $class to be class $expected"
+        );
     }
 
     function be_an_instance_of($expected) {
         $class = get_class($this->actual);
         return array(
-        $this->actual instanceof $expected,
-        "expected $class to be an instance of $expected");
+            $this->actual instanceof $expected,
+            "expected $class to be an instance of $expected"
+        );
     }
 
     function be_null() {
@@ -407,8 +417,9 @@ class Expect {
         $expected = strtolower($expected);
         $type = strtolower(gettype($this->actual));
         return array(
-        $type === $expected,
-        "expected %s to be type $expected, was $type", $this->actual);
+            $type === $expected,
+            "expected %s to be type $expected, was $type", $this->actual
+        );
     }
 
     function have_length($expected) {
@@ -418,9 +429,10 @@ class Expect {
             $length = count($this->actual);
         }
         return array(
-        $length === $expected,
-        'expected %s to have length %d, was %d',
-        $this->actual, $expected, $length);
+            $length === $expected,
+            'expected %s to have length %d, was %d',
+            $this->actual, $expected, $length
+        );
     }
 
     function have_length_within($min, $max) {
@@ -430,9 +442,10 @@ class Expect {
             $length = count($this->actual);
         }
         return array(
-        $length >= $min && $length <= $max,
-        'expected %s to have length within %d and %d, was %d',
-        $this->actual, $min, $max, $length);
+            $length >= $min && $length <= $max,
+            'expected %s to have length within %d and %d, was %d',
+            $this->actual, $min, $max, $length
+        );
     }
 
     function throw_error($className=null, $message=null) {
@@ -443,24 +456,27 @@ class Expect {
             $func = $this->actual;
             $func();
             return array(
-            false,
-            $className ?
-            "expected $className to be thrown, but was not" :
-            'expected exception to be thrown, but was not');
+                false,
+                $className ?
+                "expected $className to be thrown, but was not" :
+                'expected exception to be thrown, but was not'
+            );
         } catch (\Exception $e) {
             if ($className && !($e instanceof $className)) {
                 $actualClassName = get_class($e);
                 return array(
-                false,
-                "expected $className to be thrown, " .
-                "but got $actualClassName instead");
+                    false,
+                    "expected $className to be thrown, " .
+                    "but got $actualClassName instead"
+                );
             }
             if ($message && $e->getMessage() != $message) {
                 return array(
-                false,
-                "expected thrown exception to have message %s, " .
-                "but had message %s",
-                $message, $e->getMessage());
+                    false,
+                    "expected thrown exception to have message %s, " .
+                    "but had message %s",
+                    $message, $e->getMessage()
+                );
             }
             return true;
         }
@@ -469,46 +485,52 @@ class Expect {
     function have_been_called($expected=null) {
         if (!($this->actual instanceof Watched)) {
             throw new \Exception(
-            "have_been_called() can only be used with pecs\watched()");
+                "have_been_called() can only be used with pecs\\watched()"
+            );
         }
         $actual = $this->actual->invokeCount;
         if (is_null($expected)) {
             return array(
-            $actual > 0,
-            "expected function to have been called, but was not");
+                $actual > 0,
+                "expected function to have been called, but was not"
+            );
         } else {
             return array(
-            $expected === $actual,
-            "expected function to have been called %d times, " .
-            "but was called %d times",
-            $expected, $actual);
+                $expected === $actual,
+                "expected function to have been called %d times, " .
+                "but was called %d times",
+                $expected, $actual
+            );
         }
     }
 
     function have_been_called_with(){
         if (!($this->actual instanceof Watched)) {
             throw new \Exception(
-            "have_been_called_with() can only be used with pecs\watched()");
+                "have_been_called_with() can only be used with pecs\\watched()"
+            );
         }
         $expectedArgs = func_get_args();
         foreach ($this->actual->invokeArgs as $actualArgs) {
             if($expectedArgs === $actualArgs){
-                return array(true,
-                "expected function not to have been called with %s, but was",
-                $expectedArgs);
+                return array(
+                    true,
+                    "expected function not to have been called with %s, but was",
+                    $expectedArgs
+                );
             }
         }
         $format = "expected function to have been called with %s, but was ";
-        if(count($this->actual->invokeArgs) == 0){
+        if (count($this->actual->invokeArgs) == 0) {
             $format .= "not";
         } else {
             $format .= "called with [" .
-            str_repeat("%s, ", count($this->actual->invokeArgs) - 1) .
-            "%s]";
+                str_repeat("%s, ", count($this->actual->invokeArgs) - 1) .
+                "%s]";
         }
         return array_merge(
-        array(false, $format, $expectedArgs),
-        $this->actual->invokeArgs
+            array(false, $format, $expectedArgs),
+            $this->actual->invokeArgs
         );
     }
 }
@@ -518,15 +540,15 @@ class Failure extends \Exception {
 
 class Formatter {
     static $colors = array(
-    'bold'    => 1,
-    'black'   => 30,
-    'red'     => 31,
-    'green'   => 32,
-    'yellow'  => 33,
-    'blue'    => 34,
-    'magenta' => 35,
-    'cyan'    => 36,
-    'white'   => 37
+        'bold'    => 1,
+        'black'   => 30,
+        'red'     => 31,
+        'green'   => 32,
+        'yellow'  => 33,
+        'blue'    => 34,
+        'magenta' => 35,
+        'cyan'    => 36,
+        'white'   => 37
     );
 
     function color($string, $color) {
@@ -606,18 +628,18 @@ class HtmlFormatter extends Formatter {
         parent::after();
         $output = ob_get_clean();
         echo implode("\n", array(
-        '<!DOCTYPE html>', '<html>', '<head>',
-        '<meta charset="UTF-8"/>',
-        '<style>',
-        'body { font: 14px/1.5 Helvetica, Arial; margin: 6em 1em 1em; }',
-        '#banner { position: absolute; top: 0; }',
-        '.pecs_black { color: #000; }',
-        '.pecs_bold { font-weight: bold; }',
-        '.pecs_red { color: #c33; }',
-        '.pecs_green { color: #3c3; }',
-        '</style>',
-        '</head>',
-        '<body>'
+            '<!DOCTYPE html>', '<html>', '<head>',
+            '<meta charset="UTF-8"/>',
+            '<style>',
+            'body { font: 14px/1.5 Helvetica, Arial; margin: 6em 1em 1em; }',
+            '#banner { position: absolute; top: 0; }',
+            '.pecs_black { color: #000; }',
+            '.pecs_bold { font-weight: bold; }',
+            '.pecs_red { color: #c33; }',
+            '.pecs_green { color: #3c3; }',
+            '</style>',
+            '</head>',
+            '<body>'
         ));
         echo nl2br($output, true) . "\n";
         echo "</body>\n</html>\n";
